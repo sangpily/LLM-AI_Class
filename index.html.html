@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM AI 실무 운영법 Padlet Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            background: rgba(255, 255, 255, 0.15);
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .board-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .column {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            max-height: 800px;
+        }
+
+        .column-header {
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .column-header.blue { background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); }
+        .column-header.green { background: linear-gradient(135deg, #7ED321 0%, #6AB01E 100%); }
+        .column-header.orange { background: linear-gradient(135deg, #F5A623 0%, #D68910 100%); }
+        .column-header.purple { background: linear-gradient(135deg, #BD10E0 0%, #9B0DB8 100%); }
+
+        .column-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .post {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ddd;
+            transition: all 0.2s ease;
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .post.pinned {
+            background: #FFF9E6;
+            border-left: 4px solid #F5A623;
+        }
+
+        .post.blue-accent { border-left-color: #4A90E2; background: #F8FBFF; }
+        .post.green-accent { border-left-color: #7ED321; background: #F7FFF0; }
+        .post.orange-accent { border-left-color: #F5A623; background: #FFF9F0; }
+        .post.purple-accent { border-left-color: #BD10E0; background: #FDF5FF; }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2C3E50;
+            flex: 1;
+        }
+
+        .post-badge {
+            background: #F5A623;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .post-content {
+            font-size: 14px;
+            color: #34495E;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .post-content ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .post-content ul li {
+            margin-bottom: 4px;
+        }
+
+        .post-divider {
+            border: none;
+            border-top: 1px solid #E1E8ED;
+            margin: 12px 0;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #7F8C8D;
+            align-items: center;
+        }
+
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .file-attachment {
+            background: white;
+            border: 1px solid #E1E8ED;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-attachment:hover {
+            background: #F8F9FA;
+            border-color: #4A90E2;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        .file-size {
+            font-size: 11px;
+            color: #7F8C8D;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view {
+            background: #7ED321;
+            color: white;
+            margin-right: 4px;
+        }
+
+        .btn-view:hover {
+            background: #6AB01E;
+        }
+
+        .btn-delete {
+            background: #E74C3C;
+            color: white;
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .btn-delete:hover {
+            background: #C0392B;
+        }
+
+        .add-post-btn {
+            background: rgba(74, 144, 226, 0.1);
+            border: 2px dashed #4A90E2;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #4A90E2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-post-btn:hover {
+            background: rgba(74, 144, 226, 0.2);
+            border-style: solid;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #7F8C8D;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: #2C3E50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 8px;
+        }
+
+        .form-label-optional {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 8px;
+        }
+
+        .form-label-optional::after {
+            content: " (선택사항)";
+            font-size: 12px;
+            color: #7F8C8D;
+            font-weight: 400;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E1E8ED;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #4A90E2;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(74, 144, 226, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-area:hover {
+            background: rgba(74, 144, 226, 0.1);
+            border-color: #357ABD;
+        }
+
+        .file-upload-area.dragover {
+            background: rgba(74, 144, 226, 0.2);
+            border-color: #357ABD;
+        }
+
+        .file-list {
+            margin-top: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: #F8F9FA;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .file-item-name {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: #4A90E2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #357ABD;
+        }
+
+        /* 파일 뷰어 */
+        .file-viewer {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .file-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E1E8ED;
+        }
+
+        .file-viewer-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+
+        .file-viewer-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #34495E;
+        }
+
+        .file-viewer-content pre {
+            background: #F8F9FA;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .file-viewer-content img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .file-viewer-content video {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .file-viewer-content iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .stars {
+            color: #F5A623;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .uploaded-file-preview {
+            background: white;
+            border: 1px solid #E1E8ED;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .video-preview {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1200px) {
+            .board-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .board-container {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+
+        .column-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .column-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .column-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4A90E2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 로딩 오버레이 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div>파일 저장 중...</div>
+        </div>
+    </div>
+
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>🤖 LLM AI 실무 운영법 - 2026.02.11</h1>
+        <p>ChatGPT와 함께하는 AI 실습 워크샵</p>
+        <div class="header-info">
+            ⏰ 오후 2시 시작
+        </div>
+    </div>
+
+    <!-- 보드 컨테이너 -->
+    <div class="board-container">
+        <!-- 컬럼 1: 강의안 -->
+        <div class="column">
+            <div class="column-header blue">
+                <span>📚</span>
+                <span>강의안</span>
+            </div>
+            <div class="column-content" id="column-lecture"></div>
+        </div>
+
+        <!-- 컬럼 2: 실습파일 -->
+        <div class="column">
+            <div class="column-header green">
+                <span>📝</span>
+                <span>실습파일</span>
+            </div>
+            <div class="column-content" id="column-practice"></div>
+        </div>
+
+        <!-- 컬럼 3: 완성파일 -->
+        <div class="column">
+            <div class="column-header orange">
+                <span>✅</span>
+                <span>완성파일</span>
+            </div>
+            <div class="column-content" id="column-complete"></div>
+        </div>
+
+        <!-- 컬럼 4: 후기 -->
+        <div class="column">
+            <div class="column-header purple">
+                <span>💬</span>
+                <span>후기</span>
+            </div>
+            <div class="column-content" id="column-review"></div>
+        </div>
+    </div>
+
+    <!-- 업로드 모달 -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">새 포스트 작성</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="uploadForm" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="columnType">
+
+                <div class="form-group" id="titleGroup">
+                    <label class="form-label-optional" id="titleLabel">제목</label>
+                    <input type="text" class="form-input" id="postTitle" placeholder="예: [세션 1] AI 기초 개념">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-optional">내용</label>
+                    <textarea class="form-textarea" id="postContent" placeholder="포스트 내용을 입력하세요..."></textarea>
+                </div>
+
+                <div class="form-group" id="ratingGroup" style="display: none;">
+                    <label class="form-label-optional">만족도</label>
+                    <select class="form-select" id="postRating">
+                        <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+                        <option value="4">⭐⭐⭐⭐☆ (4점)</option>
+                        <option value="3">⭐⭐⭐☆☆ (3점)</option>
+                        <option value="2">⭐⭐☆☆ (2점)</option>
+                        <option value="1">⭐☆☆☆☆ (1점)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label-optional">파일 첨부</label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div>📎 파일을 드래그하거나 클릭하여 업로드</div>
+                        <div style="font-size: 12px; color: #7F8C8D; margin-top: 8px;" id="fileFormatInfo">
+                            지원 형식: PDF, DOCX, TXT, JPG, PNG (최대 10MB)
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif">
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <button type="submit" class="btn-primary">게시하기</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 파일 뷰어 모달 -->
+    <div class="modal" id="fileViewerModal">
+        <div class="file-viewer">
+            <div class="file-viewer-header">
+                <h2 class="file-viewer-title" id="viewerTitle"></h2>
+                <button class="modal-close" onclick="closeFileViewer()">&times;</button>
+            </div>
+            <div class="file-viewer-content" id="viewerContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // IndexedDB 설정
+        const DB_NAME = 'PadletDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'files';
+        let db = null;
+
+        // 데이터 저장소
+        let posts = {
+            lecture: [],
+            practice: [],
+            complete: [],
+            review: []
+        };
+
+        let selectedFiles = [];
+
+        // IndexedDB 초기화
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => {
+                    console.error('IndexedDB 열기 실패:', request.error);
+                    reject(request.error);
+                };
+
+                request.onsuccess = () => {
+                    db = request.result;
+                    console.log('IndexedDB 연결 성공');
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        objectStore.createIndex('postId', 'postId', { unique: false });
+                        console.log('ObjectStore 생성 완료');
+                    }
+                };
+            });
+        }
+
+        // IndexedDB에 파일 저장
+        async function saveFileToIndexedDB(fileId, fileData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.put({ id: fileId, data: fileData });
+
+                request.onsuccess = () => resolve(fileId);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // IndexedDB에서 파일 로드
+        async function loadFileFromIndexedDB(fileId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.get(fileId);
+
+                request.onsuccess = () => {
+                    if (request.result) {
+                        resolve(request.result.data);
+                    } else {
+                        resolve(null);
+                    }
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // IndexedDB에서 파일 삭제
+        async function deleteFileFromIndexedDB(fileId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.delete(fileId);
+
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // 초기화
+        async function init() {
+            console.log('Padlet 초기화 중...');
+            showLoading(true);
+            try {
+                await initDB();
+                await loadFromStorage();
+                await renderAllColumns();
+                setupEventListeners();
+            } catch (error) {
+                console.error('초기화 오류:', error);
+                alert('초기화 중 오류가 발생했습니다: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 로딩 표시
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        // LocalStorage에서 데이터 로드
+        async function loadFromStorage() {
+            try {
+                const stored = localStorage.getItem('padletPosts');
+                if (stored) {
+                    posts = JSON.parse(stored);
+                    console.log('저장된 데이터 불러오기 완료:', posts);
+                } else {
+                    // 샘플 데이터
+                    posts = {
+                        lecture: [
+                            {
+                                id: Date.now(),
+                                title: '🔗 필수 참고자료 모음',
+                                content: '<strong>🤖 AI 도구 바로가기</strong><br>• <a href="https://chat.openai.com" target="_blank">ChatGPT</a><br>• <a href="https://gemini.google.com" target="_blank">Google Gemini</a><br>• <a href="https://claude.ai" target="_blank">Claude</a>',
+                                pinned: true,
+                                files: [],
+                                timestamp: Date.now()
+                            }
+                        ],
+                        practice: [],
+                        complete: [],
+                        review: []
+                    };
+                }
+            } catch (e) {
+                console.error('데이터 로드 오류:', e);
+            }
+        }
+
+        // LocalStorage에 저장 (메타데이터만)
+        function saveToStorage() {
+            try {
+                const dataStr = JSON.stringify(posts);
+                localStorage.setItem('padletPosts', dataStr);
+                console.log('메타데이터 저장 완료');
+            } catch (e) {
+                console.error('저장 오류:', e);
+                alert('저장 중 오류가 발생했습니다: ' + e.message);
+            }
+        }
+
+        // 모든 컬럼 렌더링
+        async function renderAllColumns() {
+            await renderColumn('lecture', 'column-lecture', 'blue-accent');
+            await renderColumn('practice', 'column-practice', 'green-accent');
+            await renderColumn('complete', 'column-complete', 'orange-accent');
+            await renderColumn('review', 'column-review', 'purple-accent');
+        }
+
+        // 컬럼 렌더링
+        async function renderColumn(type, containerId, accentClass) {
+            const container = document.getElementById(containerId);
+            const columnPosts = posts[type] || [];
+
+            let html = '';
+
+            for (const post of columnPosts) {
+                html += await createPostHTML(post, type, accentClass);
+            }
+
+            const buttonTexts = {
+                lecture: '➕ 새 강의안 추가',
+                practice: '➕ 새 실습파일 추가',
+                complete: '➕ 내 결과물 업로드',
+                review: '➕ 내 후기 작성'
+            };
+
+            html += `<div class="add-post-btn" onclick="openModal('${type}')">
+                <strong>${buttonTexts[type]}</strong>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        // 포스트 HTML 생성
+        async function createPostHTML(post, type, accentClass) {
+            const pinnedClass = post.pinned ? 'pinned' : accentClass;
+            const pinnedBadge = post.pinned ? '<span class="post-badge">고정</span>' : '';
+
+            // 제목이 없으면 표시하지 않음
+            let titleHTML = '';
+            if (post.title && post.title.trim() !== '' && post.title !== '무제') {
+                titleHTML = `
+                    <div class="post-header">
+                        <span class="post-title">${post.title}</span>
+                        ${pinnedBadge}
+                    </div>
+                `;
+            } else if (post.pinned) {
+                titleHTML = `
+                    <div class="post-header">
+                        ${pinnedBadge}
+                    </div>
+                `;
+            }
+
+            let filesHTML = '';
+            if (post.files && post.files.length > 0) {
+                for (let index = 0; index < post.files.length; index++) {
+                    const file = post.files[index];
+
+                    // IndexedDB에서 파일 데이터 로드
+                    if (file.fileId) {
+                        const fileData = await loadFileFromIndexedDB(file.fileId);
+                        if (fileData) {
+                            file.data = fileData;
+                        }
+                    }
+
+                    if (file.type && file.type.startsWith('image/') && file.data) {
+                        filesHTML += `
+                            <div class="uploaded-file-preview">
+                                <img src="${file.data}" class="image-preview" alt="${file.name}" onclick="viewFile('${type}', ${post.id}, ${index})">
+                                <div style="margin-top: 8px; font-size: 12px; color: #7F8C8D;">${file.name}</div>
+                            </div>
+                        `;
+                    } else if (file.type && file.type.startsWith('video/') && file.data) {
+                        filesHTML += `
+                            <div class="uploaded-file-preview">
+                                <video class="video-preview" controls>
+                                    <source src="${file.data}" type="${file.type}">
+                                    브라우저가 비디오를 지원하지 않습니다.
+                                </video>
+                                <div style="margin-top: 8px; font-size: 12px; color: #7F8C8D;">${file.name}</div>
+                            </div>
+                        `;
+                    } else {
+                        const icon = getFileIcon(file.type || '');
+                        filesHTML += `
+                            <div class="file-attachment" onclick="viewFile('${type}', ${post.id}, ${index})">
+                                <span class="file-icon">${icon}</span>
+                                <div class="file-info">
+                                    <div class="file-name">${file.name}</div>
+                                    <div class="file-size">${formatFileSize(file.size || 0)}</div>
+                                </div>
+                                <button class="btn btn-view" onclick="event.stopPropagation(); viewFile('${type}', ${post.id}, ${index})">👁️ 보기</button>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            let ratingHTML = '';
+            if (post.rating) {
+                const stars = '⭐'.repeat(post.rating) + '☆'.repeat(5 - post.rating);
+                ratingHTML = `<div class="stars">${stars}</div>`;
+            }
+
+            // 내용이 없으면 표시하지 않음
+            let contentHTML = '';
+            if (post.content && post.content.trim() !== '') {
+                contentHTML = post.content;
+            }
+
+            const timeAgo = getTimeAgo(post.timestamp || Date.now());
+
+            return `
+                <div class="post ${pinnedClass}">
+                    ${titleHTML}
+                    <div class="post-content">
+                        ${contentHTML}
+                        ${filesHTML}
+                        ${ratingHTML}
+                    </div>
+                    <div class="post-meta">
+                        <span>⏰ ${timeAgo}</span>
+                        <button class="btn btn-delete" onclick="deletePost('${type}', ${post.id})">🗑️ 삭제</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 파일 아이콘
+        function getFileIcon(type) {
+            if (!type) return '📎';
+            if (type.includes('pdf')) return '📄';
+            if (type.includes('word') || type.includes('document')) return '📝';
+            if (type.includes('text')) return '📃';
+            if (type.includes('image')) return '🖼️';
+            if (type.includes('video')) return '🎬';
+            return '📎';
+        }
+
+        // 파일 크기 포맷
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // 시간 포맷
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            if (seconds < 60) return '방금 전';
+            if (seconds < 3600) return Math.floor(seconds / 60) + '분 전';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + '시간 전';
+            return Math.floor(seconds / 86400) + '일 전';
+        }
+
+        // 모달 열기
+        function openModal(type) {
+            const modal = document.getElementById('uploadModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const ratingGroup = document.getElementById('ratingGroup');
+            const titleLabel = document.getElementById('titleLabel');
+            const postTitle = document.getElementById('postTitle');
+            const fileFormatInfo = document.getElementById('fileFormatInfo');
+            const fileInput = document.getElementById('fileInput');
+
+            const titles = {
+                lecture: '새 강의안 추가',
+                practice: '새 실습파일 추가',
+                complete: '내 결과물 업로드',
+                review: '내 후기 작성'
+            };
+
+            modalTitle.textContent = titles[type];
+            document.getElementById('columnType').value = type;
+
+            // 후기 섹션: 제목을 "성명"으로 변경
+            if (type === 'review') {
+                titleLabel.textContent = '성명';
+                postTitle.placeholder = '예: 홍길동';
+                ratingGroup.style.display = 'block';
+            } else {
+                titleLabel.textContent = '제목';
+                postTitle.placeholder = '예: [세션 1] AI 기초 개념';
+                ratingGroup.style.display = 'none';
+            }
+
+            // 완성파일: 동영상 파일 업로드 가능하도록 수정 (최대 100MB)
+            if (type === 'complete') {
+                fileFormatInfo.textContent = '지원 형식: PDF, DOCX, TXT, JPG, PNG, MP4, AVI, MOV (최대 100MB)';
+                fileInput.setAttribute('accept', '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.wmv,.flv,.webm');
+            } else {
+                fileFormatInfo.textContent = '지원 형식: PDF, DOCX, TXT, JPG, PNG (최대 10MB)';
+                fileInput.setAttribute('accept', '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif');
+            }
+
+            modal.classList.add('active');
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileList').innerHTML = '';
+            selectedFiles = [];
+        }
+
+        // 파일 뷰어 닫기
+        function closeFileViewer() {
+            document.getElementById('fileViewerModal').classList.remove('active');
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            fileUploadArea.addEventListener('click', () => fileInput.click());
+
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            document.getElementById('uploadModal').addEventListener('click', (e) => {
+                if (e.target.id === 'uploadModal') closeModal();
+            });
+
+            document.getElementById('fileViewerModal').addEventListener('click', (e) => {
+                if (e.target.id === 'fileViewerModal') closeFileViewer();
+            });
+        }
+
+        // 파일 처리
+        function handleFiles(files) {
+            const type = document.getElementById('columnType').value;
+            const maxSize = type === 'complete' ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+
+            Array.from(files).forEach(file => {
+                if (file.size > maxSize) {
+                    alert(`${file.name}은(는) ${maxSize / (1024 * 1024)}MB를 초과합니다.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedFiles.push({
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: e.target.result
+                    });
+                    renderFileList();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 파일 목록 렌더링
+        function renderFileList() {
+            const fileList = document.getElementById('fileList');
+            let html = '';
+
+            selectedFiles.forEach((file, index) => {
+                html += `
+                    <div class="file-item">
+                        <span>${getFileIcon(file.type)}</span>
+                        <span class="file-item-name">${file.name}</span>
+                        <span style="font-size: 11px; color: #7F8C8D;">${formatFileSize(file.size)}</span>
+                        <button type="button" class="btn btn-delete" onclick="removeFile(${index})">×</button>
+                    </div>
+                `;
+            });
+
+            fileList.innerHTML = html;
+        }
+
+        // 파일 제거
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderFileList();
+        }
+
+        // 폼 제출 처리
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            console.log('폼 제출됨');
+
+            const type = document.getElementById('columnType').value;
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim().replace(/\n/g, '<br>');
+            const rating = type === 'review' ? parseInt(document.getElementById('postRating').value) : null;
+
+            // 제목, 내용, 첨부파일 모두 없으면 경고
+            if (!title && !content && selectedFiles.length === 0) {
+                alert('제목, 내용 또는 파일 중 최소 하나는 입력해주세요.');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const postId = Date.now();
+                const processedFiles = [];
+
+                // 파일을 IndexedDB에 저장
+                for (const file of selectedFiles) {
+                    const fileId = `${postId}_${file.name}_${Date.now()}`;
+                    await saveFileToIndexedDB(fileId, file.data);
+                    processedFiles.push({
+                        fileId: fileId,
+                        name: file.name,
+                        type: file.type,
+                        size: file.size
+                        // data는 저장하지 않음 (IndexedDB에서 로드)
+                    });
+                }
+
+                const newPost = {
+                    id: postId,
+                    title: title || '',
+                    content: content || '',
+                    rating: rating,
+                    files: processedFiles,
+                    pinned: false,
+                    timestamp: Date.now()
+                };
+
+                if (!posts[type]) {
+                    posts[type] = [];
+                }
+
+                posts[type].push(newPost);
+                console.log('포스트 배열에 추가됨:', newPost);
+
+                saveToStorage();
+                await renderAllColumns();
+                closeModal();
+
+                alert('게시되었습니다!');
+            } catch (error) {
+                console.error('게시 오류:', error);
+                alert('게시 중 오류가 발생했습니다: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 포스트 삭제
+        async function deletePost(type, postId) {
+            if (!confirm('정말 삭제하시겠습니까?')) return;
+
+            showLoading(true);
+
+            try {
+                // 포스트의 파일들을 IndexedDB에서 삭제
+                const post = posts[type].find(p => p.id === postId);
+                if (post && post.files) {
+                    for (const file of post.files) {
+                        if (file.fileId) {
+                            await deleteFileFromIndexedDB(file.fileId);
+                        }
+                    }
+                }
+
+                posts[type] = posts[type].filter(post => post.id !== postId);
+                saveToStorage();
+                await renderAllColumns();
+            } catch (error) {
+                console.error('삭제 오류:', error);
+                alert('삭제 중 오류가 발생했습니다: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // 파일 보기
+        async function viewFile(type, postId, fileIndex) {
+            const post = posts[type].find(p => p.id === postId);
+            if (!post || !post.files || !post.files[fileIndex]) {
+                alert('파일을 찾을 수 없습니다.');
+                return;
+            }
+
+            const file = post.files[fileIndex];
+
+            showLoading(true);
+
+            try {
+                // IndexedDB에서 파일 데이터 로드
+                if (file.fileId && !file.data) {
+                    const fileData = await loadFileFromIndexedDB(file.fileId);
+                    if (fileData) {
+                        file.data = fileData;
+                    } else {
+                        alert('파일 데이터를 불러올 수 없습니다.');
+                        showLoading(false);
+                        return;
+                    }
+                }
+
+                const modal = document.getElementById('fileViewerModal');
+                const title = document.getElementById('viewerTitle');
+                const content = document.getElementById('viewerContent');
+
+                title.textContent = file.name;
+
+                if (file.type && file.type.startsWith('image/')) {
+                    content.innerHTML = `<img src="${file.data}" style="max-width: 100%; border-radius: 8px;" alt="${file.name}">`;
+                } else if (file.type && file.type.startsWith('video/')) {
+                    content.innerHTML = `
+                        <video controls style="max-width: 100%; border-radius: 8px;">
+                            <source src="${file.data}" type="${file.type}">
+                            브라우저가 비디오를 지원하지 않습니다.
+                        </video>
+                    `;
+                } else if (file.type && file.type === 'application/pdf') {
+                    // PDF는 iframe으로 바로 열기
+                    content.innerHTML = `<iframe src="${file.data}" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>`;
+                } else if (file.type && file.type.includes('text')) {
+                    fetch(file.data)
+                        .then(res => res.text())
+                        .then(text => {
+                            content.innerHTML = `<pre>${escapeHtml(text)}</pre>`;
+                        })
+                        .catch(() => {
+                            content.innerHTML = '<p>텍스트를 불러올 수 없습니다.</p>';
+                        });
+                } else {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">${getFileIcon(file.type)}</div>
+                            <div style="font-size: 18px; color: #2C3E50; margin-bottom: 20px;">${file.name}</div>
+                            <div style="color: #7F8C8D; margin-bottom: 20px;">이 파일을 다운로드하여 확인하세요</div>
+                            <a href="${file.data}" download="${file.name}" class="btn btn-view" style="display: inline-block; text-decoration: none; padding: 12px 24px;">⬇️ 다운로드</a>
+                        </div>
+                    `;
+                }
+
+                modal.classList.add('active');
+            } catch (error) {
+                console.error('파일 열기 오류:', error);
+                alert('파일을 열 수 없습니다: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // HTML 이스케이프
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 초기화 실행
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
